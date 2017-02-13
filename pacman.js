@@ -1,7 +1,8 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
-var power_pellets = 4
+var power_pellets = 4;
+var dots = 240;
 
 // Define your ghosts here
 // 1, Inky, Red, Shadow
@@ -13,7 +14,8 @@ var inky = {
   name: 'Inky',
   colour: 'Red',
   character: 'Shadow',
-  edible: false
+  edible: false,
+  point: 200,
 };
 
 var blinky = {
@@ -21,7 +23,8 @@ var blinky = {
   name: 'Blinky',
   colour: 'Cyan',
   character: 'Speedy',
-  edible: false
+  edible: false,
+  point: 400,
 };
 
 var pinky = {
@@ -29,7 +32,8 @@ var pinky = {
   name: 'Pinky',
   colour: 'Pink',
   character: 'Bashful',
-  edible: false
+  edible: false,
+  point: 800,
 };
 
 var clyde = {
@@ -37,7 +41,8 @@ var clyde = {
   name: 'Clyde',
   colour: 'Orange',
   character: 'Pokey',
-  edible: false
+  edible: false,
+  point: 1600,
 };
 
 ghosts = [inky, blinky, pinky, clyde]
@@ -60,9 +65,11 @@ function eatGhost(ghost) {
   if (ghost.edible == false) {
     lives -= 1;
     console.log('Ghost ' + ghost.name + ', colour ' + ghost.colour + ' kills Pac-Man');
-  }else {
+
+  } else {
+
     console.log('\nPac-man eats ' + ghost.name + '!');
-    score += 200;
+    score += ghost.point;
     ghost.edible = false;
   }
   checkLives();
@@ -97,17 +104,24 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives  + '\n\nPower-Pellets: ' + power_pellets);
+  console.log('Score: ' + score + '     Lives: ' + lives  + '\n\nPower-Pellets: ' + power_pellets +
+  '\n\nDots: ' + dots);
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
-  console.log('(d) Eat Dot');
+  if(dots > 10 ){
+    console.log('(d) Eat 10 Dots');
+    console.log('(e) Eat 100 Dots');
+    console.log('(f) Eat All Dots');
+  }else{
+    console.log('(f) Eat All Dots');
+  }
 
   console.log('(p) Eat Power-Pellet');
 
   for (var i = 0; i < ghosts.length; i++) {
-    console.log('('+ ghosts[i].menu_option + ') Eat ' + ghosts[i].name + 'Edible: '+ ghosts[i].edible);
+    console.log('('+ ghosts[i].menu_option + ') Eat ' + ghosts[i].name + ' Edible: '+ ghosts[i].edible);
   }
 
   console.log('(q) Quit');
@@ -122,9 +136,18 @@ function displayPrompt() {
 
 
 // Menu Options
-function eatDot() {
+function eatDot(n) {
   console.log('\nChomp!');
-  score += 10;
+  if( n==10 ){
+    score += 10;
+    dots -= 10;
+  }else if( n == 100 ){
+    score += 100;
+    dots -= 100;
+  }else{
+    score += dots;
+    dots = 0;
+  }
 }
 
 
@@ -139,6 +162,12 @@ function processInput(key) {
       eatPowerPellet();
       break;
     case 'd':
+      eatDot(10);
+      break;
+    case 'e':
+      eatDot(100);
+      break;
+    case 'f':
       eatDot();
       break;
     case '1':
