@@ -3,12 +3,25 @@ var score = 0;
 var lives = 2;
 var power_pellets = 4;
 var dots = 240;
+var fruitShown = false;
+var level = 0;
 
-// Define your ghosts here
-// 1, Inky, Red, Shadow
-// 2, Blinky, Cyan, Speedy
-// 3, Pinky, Pink, Bashful
-// 4, Clyde, Orange, Pokey
+var levels = {
+  1: {fruit: 'Cherry', points: 100},
+  2: {fruit: 'Strawberry', points: 300},
+  3: {fruit: 'Orange', points: 500},
+  4: {fruit: 'Orange', points: 500},
+  5: {fruit: 'Apple', points: 700},
+  6: {fruit: 'Apple', points: 700},
+  7: {fruit: 'Pineapple', points: 1000},
+  8: {fruit: 'Pineapple', points: 1000},
+  9: {fruit: 'Galaxian Spaceship', points: 2000},
+  10: {fruit: 'Galaxian Spaceship', points: 2000},
+  11: {fruit: 'Bell', points: 3000},
+  12: {fruit: 'Bell', points: 3000},
+  13: {fruit: 'Key', points: 5900},
+}
+
 var inky = {
   menu_option: '1',
   name: 'Inky',
@@ -81,10 +94,21 @@ function eatGhost(ghost) {
 // reduce the number of Power-Pellets remaining
 function eatPowerPellet() {
   score += 50;
-  for (var i = 0; i < ghosts.length; i++) {
-   ghosts[i].edible = true;
-  }
+  ghostsEdible(true);
+  // for (var i = 0; i < ghosts.length; i++) {
+  //  ghosts[i].edible = true;
+  // }
   power_pellets -= 1;
+}
+
+function ghostsEdible (t){
+  for (var i = 0; i < ghosts.length; i++) {
+    if (t == true){
+      ghosts[i].edible = true;
+    } else {
+      ghosts[i].edible = false;
+    }
+  }
 }
 
 
@@ -95,7 +119,7 @@ function drawScreen() {
     displayStats();
     displayMenu();
     displayPrompt();
-  }, 1000);
+  }, 800);
 }
 
 //keyboard shortcut to clear terminal
@@ -105,21 +129,35 @@ function clearScreen() {
 
 function displayStats() {
   console.log('Score: ' + score + '     Lives: ' + lives  + '\n\nPower-Pellets: ' + power_pellets +
-  '\n\nDots: ' + dots);
+  '\n\nDots: ' + dots +
+  '\n\nLevel: ' + level +
+  '\n\nFruitshown: ' + fruitShown);
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
-  if(dots > 10 ){
+
+  //Eat Fruits
+  if (fruitShown == true) {
+    console.log('(g) '+ 'Eat ' + levels[level].fruit + ' ' + levels[level].points + ' Dots');
+  }
+
+  //Eat Dots
+  if(dots > 100 ){
     console.log('(d) Eat 10 Dots');
     console.log('(e) Eat 100 Dots');
+    console.log('(f) Eat All Dots');
+  }else if(dots > 10){
+    console.log('(d) Eat 10 Dots');
     console.log('(f) Eat All Dots');
   }else{
     console.log('(f) Eat All Dots');
   }
 
+  //Eat Power-Pellet
   console.log('(p) Eat Power-Pellet');
 
+  //(1) Eat Inky
   for (var i = 0; i < ghosts.length; i++) {
     console.log('('+ ghosts[i].menu_option + ') Eat ' + ghosts[i].name + ' Edible: '+ ghosts[i].edible);
   }
@@ -150,6 +188,27 @@ function eatDot(n) {
   }
 }
 
+//After Pac-Man has eaten all 4 power pellets and all 240 dots in the maze, he advances to the next level and the dots and pellets are reset. The ghosts should also be reset to inedible. There are 256 levels. Add the appropriate fruits. Make the fruit option randomly appear in the menu after the player eats some dots.
+function showFruit() {
+  if (fruitShown === false && Math.random() < 0.7 ){
+    fruitShown = true;
+  }
+}
+
+function eatFruit(level) {
+  score += levels[level].points;
+  fruitShown = false;
+}
+
+function checkLevel() {
+  if (dots === 0 && power_pellets === 0){
+    level += 1;
+    dots = 240;
+    power_pellets = 4;
+    ghostsEdible(false);
+    fruitShown = false;
+  }
+}
 
 // Process Player's Input
 function processInput(key) {
@@ -169,6 +228,9 @@ function processInput(key) {
       break;
     case 'f':
       eatDot();
+      break;
+    case 'g':
+      eatFruit(level);
       break;
     case '1':
       eatGhost(ghosts[0]);
@@ -205,6 +267,10 @@ drawScreen();
 stdin.on('data', function(key) {
   process.stdout.write(key);
   processInput(key);
+  if (level >= 1) {
+    showFruit();
+  }
+  checkLevel();
   setTimeout(drawScreen, 300); // The command prompt will flash a message for 300 milliseoncds before it re-draws the screen. You can adjust the 300 number to increase this.
 });
 
