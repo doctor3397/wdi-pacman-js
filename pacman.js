@@ -1,7 +1,7 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
-
+var power_pellets = 4
 
 // Define your ghosts here
 // 1, Inky, Red, Shadow
@@ -42,18 +42,6 @@ var clyde = {
 
 ghosts = [inky, blinky, pinky, clyde]
 
-// add a function called eatGhost that accepts a ghost as an argument
-// the eatGhost should check to see if a ghost is edible. If it's not, Pac-Man should lose a life, include a quick sentence that says the name and colour of the ghost that kills Pac-Man (similar to how it quickly flashes chomp on the screen when you eat a dot)
-function eatGhost(ghost) {
-  if (ghost.edible == false) {
-    lives -= 1;
-    console.log('Ghost ' + ghost.name + ', colour ' + ghost.colour + ' kills Pac-Man');
-  }else {
-    score += 5;
-  }
-  checkLives();
-}
-
 // If Pac-Man's lives go below 0, it's Game Over and you should exit the game. Create a function that checks for this every time Pac-Man loses a life, and calls process.exit(); if necessary.
 function checkLives() {
   if (lives <= 0){
@@ -62,35 +50,66 @@ function checkLives() {
   }
 }
 
+// add a function called eatGhost that accepts a ghost as an argument
+// the eatGhost should check to see if a ghost is edible. If it's not, Pac-Man should lose a life, include a quick sentence that says the name and colour of the ghost that kills Pac-Man (similar to how it quickly flashes chomp on the screen when you eat a dot)
+
+//say a quick sentence about the ghost just eaten and its personality (similar to how it flashes Chomp! when Pac-Man eats a dot)
+// Pac-Man gains 200 points
+// the ghost's edible property changes to false (as it regenerates in its offensive form)
+function eatGhost(ghost) {
+  if (ghost.edible == false) {
+    lives -= 1;
+    console.log('Ghost ' + ghost.name + ', colour ' + ghost.colour + ' kills Pac-Man');
+  }else {
+    console.log('\nPac-man eats ' + ghost.name + '!');
+    score += 200;
+    ghost.edible = false;
+  }
+  checkLives();
+}
+
+//eatPowerPellet function that's executed when the p key is entered. It should:
+// increase Pac-Man's score by 50 points
+// change all the ghost's edible property to true
+// reduce the number of Power-Pellets remaining
+function eatPowerPellet() {
+  score += 50;
+  for (var i = 0; i < ghosts.length; i++) {
+   ghosts[i].edible = true;
+  }
+  power_pellets -= 1;
+}
+
 
 // Draw the screen functionality
 function drawScreen() {
-  clearScreen();
   setTimeout(function() {
+    clearScreen();
     displayStats();
     displayMenu();
     displayPrompt();
-  }, 10);
+  }, 1000);
 }
 
+//keyboard shortcut to clear terminal
 function clearScreen() {
   console.log('\x1Bc');
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives);
+  console.log('Score: ' + score + '     Lives: ' + lives  + '\n\nPower-Pellets: ' + power_pellets);
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
   console.log('(d) Eat Dot');
+
+  console.log('(p) Eat Power-Pellet');
+
   for (var i = 0; i < ghosts.length; i++) {
-    console.log('('+ ghosts[i].menu_option + ') Eat ' + ghosts[i].name);
+    console.log('('+ ghosts[i].menu_option + ') Eat ' + ghosts[i].name + 'Edible: '+ ghosts[i].edible);
   }
-  // console.log('(1) Eat Inky');
-  // console.log('(2) Eat Blinky');
-  // console.log('(3) Eat Pinky');
-  // console.log('(4) Eat Clyde');
+
   console.log('(q) Quit');
 
 }
@@ -115,6 +134,9 @@ function processInput(key) {
     case '\u0003': // This makes it so CTRL-C will quit the program
     case 'q':
       process.exit();
+      break;
+    case 'p':
+      eatPowerPellet();
       break;
     case 'd':
       eatDot();
