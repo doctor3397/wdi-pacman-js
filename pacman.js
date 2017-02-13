@@ -17,7 +17,7 @@ var inky = {
 };
 
 var blinky = {
-  menu_option: '1',
+  menu_option: '2',
   name: 'Blinky',
   colour: 'Cyan',
   character: 'Speedy',
@@ -25,7 +25,7 @@ var blinky = {
 };
 
 var pinky = {
-  menu_option: '1',
+  menu_option: '3',
   name: 'Pinky',
   colour: 'Pink',
   character: 'Bashful',
@@ -33,14 +33,34 @@ var pinky = {
 };
 
 var clyde = {
-  menu_option: '1',
+  menu_option: '4',
   name: 'Clyde',
   colour: 'Orange',
   character: 'Pokey',
   edible: false
 };
 
-// replace this comment with your four ghosts setup as objects
+ghosts = [inky, blinky, pinky, clyde]
+
+// add a function called eatGhost that accepts a ghost as an argument
+// the eatGhost should check to see if a ghost is edible. If it's not, Pac-Man should lose a life, include a quick sentence that says the name and colour of the ghost that kills Pac-Man (similar to how it quickly flashes chomp on the screen when you eat a dot)
+function eatGhost(ghost) {
+  if (ghost.edible == false) {
+    lives -= 1;
+    console.log('Ghost ' + ghost.name + ', colour ' + ghost.colour + ' kills Pac-Man');
+  }else {
+    score += 5;
+  }
+  checkLives();
+}
+
+// If Pac-Man's lives go below 0, it's Game Over and you should exit the game. Create a function that checks for this every time Pac-Man loses a life, and calls process.exit(); if necessary.
+function checkLives() {
+  if (lives <= 0){
+    console.log('Pac-Man dies!');
+    process.exit()
+  }
+}
 
 
 // Draw the screen functionality
@@ -64,8 +84,17 @@ function displayStats() {
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
   console.log('(d) Eat Dot');
+  for (var i = 0; i < ghosts.length; i++) {
+    console.log('('+ ghosts[i].menu_option + ') Eat ' + ghosts[i].name);
+  }
+  // console.log('(1) Eat Inky');
+  // console.log('(2) Eat Blinky');
+  // console.log('(3) Eat Pinky');
+  // console.log('(4) Eat Clyde');
   console.log('(q) Quit');
+
 }
+
 
 function displayPrompt() {
   // process.stdout.write is similar to console.log except it doesn't add a new line after the text
@@ -89,6 +118,18 @@ function processInput(key) {
       break;
     case 'd':
       eatDot();
+      break;
+    case '1':
+      eatGhost(ghosts[0]);
+      break;
+    case '2':
+      eatGhost(ghosts[1]);
+      break;
+    case '3':
+      eatGhost(ghosts[2]);
+      break;
+    case '4':
+      eatGhost(ghosts[3]);
       break;
     default:
       console.log('\nInvalid Command!');
