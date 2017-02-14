@@ -94,14 +94,21 @@ function eatGhost(ghost) {
 // reduce the number of Power-Pellets remaining
 function eatPowerPellet() {
   score += 50;
+  power_pellets -= 1;
+
   ghostsEdible(true);
+
+  setTimeout(function() {
+    ghostsEdible(false);
+    drawScreen();
+  }, 5000)
+
   // for (var i = 0; i < ghosts.length; i++) {
   //  ghosts[i].edible = true;
   // }
-  power_pellets -= 1;
 }
 
-function ghostsEdible (t){
+function ghostsEdible(t){
   for (var i = 0; i < ghosts.length; i++) {
     if (t == true){
       ghosts[i].edible = true;
@@ -109,6 +116,7 @@ function ghostsEdible (t){
       ghosts[i].edible = false;
     }
   }
+  console.log("Ghosts are set to " + t);
 }
 
 
@@ -210,6 +218,18 @@ function checkLevel() {
   }
 }
 
+// Prevent Pac-Man from eating a power-pellet if one has already been consumed and there are edible ghosts remaining.
+function checkGhostsEdible() {
+  for (var i = 0; i < ghosts.length; i++) {
+    if (ghosts[i].edible === true){
+      return true;
+    }
+  }
+  // When no one's edible
+  return false;
+}
+
+
 // Process Player's Input
 function processInput(key) {
   switch(key) {
@@ -218,7 +238,12 @@ function processInput(key) {
       process.exit();
       break;
     case 'p':
-      eatPowerPellet();
+      // Check if all ghosts are not edible
+      if (checkGhostsEdible() === false){
+        eatPowerPellet();
+      } else {
+        console.log("Eat all the ghosts before eat a Power Pellet")
+      }
       break;
     case 'd':
       eatDot(10);
@@ -266,6 +291,7 @@ drawScreen();
 // Process input and draw screen each time player enters a key
 stdin.on('data', function(key) {
   process.stdout.write(key);
+
   processInput(key);
   if (level >= 1) {
     showFruit();
